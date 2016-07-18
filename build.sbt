@@ -14,14 +14,17 @@ val commonSettings = Seq(
     "-unchecked",
     "-Xfatal-warnings",
     "-Xlint"
-  ),
-
-  doctestTestFramework := DoctestTestFramework.ScalaTest
+  )
 )
 
 lazy val root = project.in(file("."))
   .settings(commonSettings :_*)
   .settings(
     name := "akka-utf8-decoder",
-    description := "Akka UTF8 docoder"
+    description := "Akka UTF8 docoder",
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-stream" % "2.4.8",
+      "org.scalatest" %% "scalatest" % "3.0.0-RC4" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.13.2" % "test"
+    )
   )
