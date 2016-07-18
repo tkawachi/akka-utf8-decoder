@@ -8,19 +8,19 @@ import org.scalacheck.Gen
 import org.scalatest
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.prop.PropertyChecks
-import org.scalatest.{ BeforeAndAfter, FunSuite }
+import org.scalatest.{ BeforeAndAfterAll, FunSuite }
 
-class Utf8DecoderTest extends FunSuite with PropertyChecks with ScalaFutures with BeforeAndAfter {
+class Utf8DecoderTest extends FunSuite with PropertyChecks with ScalaFutures with BeforeAndAfterAll {
 
   implicit var actorSystem: ActorSystem = _
 
   implicit def materializer(implicit actorSystem: ActorSystem): Materializer = ActorMaterializer()
 
-  before {
+  override def beforeAll(): Unit = {
     actorSystem = ActorSystem("system")
   }
 
-  after {
+  override def afterAll(): Unit = {
     actorSystem.terminate()
   }
 
