@@ -1,5 +1,7 @@
 package com.github.tkawachi.akka
 
+import java.nio.charset.StandardCharsets
+
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
 import akka.stream.{ ActorMaterializer, Materializer }
@@ -38,11 +40,21 @@ class Utf8DecoderTest extends FunSuite with PropertyChecks with ScalaFutures wit
 
   def splitTest(bs: ByteString): scalatest.Assertion = {
     forAll((Gen.chooseNum(0, bs.length), "splitAt")) { splitAt =>
+      val expected = bs.utf8String
+
       val (bs1, bs2) = bs.splitAt(splitAt)
       val source = Source.single(bs1) ++ Source.single(bs2)
       val actual = source.via(Utf8Decoder.flow).runReduce(_ ++ _)
-      val expected = bs.utf8String
       assert(actual.futureValue == expected)
+    }
+  }
+
+  test("followingBytes") {
+    forAll("char", minSuccessful(10000)) { (char: Char) =>
+      val bytes = String.valueOf(char).getBytes(StandardCharsets.UTF_8)
+      val fbs = bytes.map(Utf8Decoder.followingBytes)
+      assert(fbs.head == bytes.length - 1)
+      assert(fbs.tail.forall(_ == -1))
     }
   }
 }
